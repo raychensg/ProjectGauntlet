@@ -10,20 +10,20 @@ import java.util.ArrayList;
 
 import javax.swing.event.MouseInputAdapter;
 
-/* Displays a full screen, with an arc that sweeps in a circle
+/* Displays a full screen, with arcs that sweep in a circle
  */
 
-public class Day5 extends Display{
+public class ArcTest extends Display{
 	private DisplayFrame frame;
 	public void init() {
-		frame = new Day5Frame();
+		frame = new ArcFrame();
 		setUp(frame);
 		frame.init();
 	}
 }
 
 
-class Day5Frame extends DisplayFrame {
+class ArcFrame extends DisplayFrame {
 	//Background
 	//private String bgFileName = "kiritsugu.png"; //Transparency works! Commented outbecause it gets messy
 	private String bgFileName = "kingdra.jpg";

@@ -27,17 +27,17 @@ import javax.swing.event.MouseInputAdapter;
 /* Displays a full screen, with ripples that appear when the mouse is clicked or moved.
  */
 
-public class Day0 extends Display{
+public class RippleTest extends Display{
 	private DisplayFrame frame;
 	public void init() {
-		frame = new Day0Frame();
+		frame = new RippleFrame();
 		setUp(frame);
 		frame.init();
 	}
 }
 
 
-class Day0Frame extends DisplayFrame {
+class RippleFrame extends DisplayFrame {
 	//Background
 	private String bgFileName = "kingdra.jpg";
 	
