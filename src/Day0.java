@@ -38,22 +38,13 @@ public class Day0 extends Display{
 
 
 class Day0Frame extends DisplayFrame {
-	//Graphics
-	private Graphics2D g2;
-	private Dimension dim;	
-	private BufferedImage image;
-	private Graphics2D imageg2;
-
-	private final int FPS = 120;
-	
 	//Background
-	private final Color BACKGROUND_COLOR = Color.white;	
-	private File backgroundFile;
-	private BufferedImage backgroundImage = null;
+	private String bgFileName = "kingdra.jpg";
 	
 	//Audio
-	//private File drop1 = new File("drop1.wav");
-	//private File drop2 = new File("drop2.wav");
+	private File drop1 = new File("drop1.wav");
+	private File drop2 = new File("drop2.wav");
+	private File drop3 = new File("drop3.wav");
 	
 	//Functionality
 	private final int SMALL = 2;
@@ -61,7 +52,7 @@ class Day0Frame extends DisplayFrame {
 	private final int HUGE = 6*SMALL;
 	private final int SPACING = 20;
 	private final int VARIANCE = 200;
-	private final int RAININESS = 9;
+	private final int RAININESS = 2;
 	private double time;
 		
 	//Data
@@ -69,13 +60,14 @@ class Day0Frame extends DisplayFrame {
 	private ArrayList<Ripple> ripplesQueue = new ArrayList<Ripple>();
 	
 	public void init() {
-		g2 = (Graphics2D) this.getGraphics();
-		dim = this.getSize();
-		image = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
-		imageg2 = image.createGraphics();
-		addKeyboard();
-		addMouse();
-		
+		try {
+			backgroundFile = new File(bgFileName);
+		}
+		catch (Exception e) {
+			System.out.println("File Load Failed");
+			//Logger here
+		}
+		super.init();
 		run();
 	}
 	
@@ -122,29 +114,23 @@ class Day0Frame extends DisplayFrame {
 			int oldX, oldY;
 			public void mousePressed(MouseEvent e) {
 				ripplesQueue.add(new Ripple(e.getX(), e.getY(), LARGE));
-				//if (2*Math.random() > 1)
-				//	playAudio(drop1, 2000);
-				//else
-				//	playAudio(drop2, 2000);
+				playAudio(drop3, 2000);
 				time = 0;
 			}		
 			public void mouseReleased(MouseEvent e) {
 				if (time > 250) {
 					ripplesQueue.add(new Ripple(e.getX(), e.getY(), HUGE));
-					//if (2*Math.random() > 1)
-					//	playAudio(drop1, 2000);
-					//else
-					//	playAudio(drop2, 2000);
+					playAudio(drop3, 2000);
 					time = 0;
 				}
 			}
 			public void mouseMoved(MouseEvent e) {
 				if (VARIANCE*Math.random() + SPACING < Math.sqrt((oldX-e.getX())*(oldX-e.getX()) + (oldY-e.getY())*(oldY-e.getY()))) {
 					ripplesQueue.add(new Ripple(e.getX(), e.getY(), SMALL));
-					//if (2*Math.random() > 1)
-					//	playAudio(drop1, 2000);
-					//else
-					//	playAudio(drop2, 2000);
+					if (2*Math.random() > 1)
+						playAudio(drop1, 2000);
+					else
+						playAudio(drop2, 2000);
 					oldX = e.getX();
 					oldY = e.getY();
 				}
@@ -152,10 +138,10 @@ class Day0Frame extends DisplayFrame {
 			public void mouseDragged(MouseEvent e) {
 				if (VARIANCE*Math.random() + SPACING < Math.sqrt((oldX-e.getX())*(oldX-e.getX()) + (oldY-e.getY())*(oldY-e.getY()))) {
 					ripplesQueue.add(new Ripple(e.getX(), e.getY(), SMALL));
-					//if (2*Math.random() > 1)
-					//	playAudio(drop1, 2000);
-					//else
-					//	playAudio(drop2, 2000);
+					if (2*Math.random() > 1)
+						playAudio(drop1, 2000);
+					else
+						playAudio(drop2, 2000);
 					oldX = e.getX();
 					oldY = e.getY();
 				}
@@ -169,10 +155,10 @@ class Day0Frame extends DisplayFrame {
 		for (int i = 0; i < RAININESS; i++)  {
 			if (RAININESS*Math.random() > 10*Math.random()) {
 				ripplesQueue.add(new Ripple((int)(Math.random()*dim.width), (int)(Math.random()*dim.height), SMALL));
-				//if (2*Math.random() > 1)
-				//	playAudio(drop1, 2000);
-				//else
-				//	playAudio(drop2, 2000);
+				if (2*Math.random() > 1)
+					playAudio(drop1, 2000);
+				else
+					playAudio(drop2, 2000);
 			}
 		}
 	}

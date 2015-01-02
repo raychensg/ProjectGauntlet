@@ -24,40 +24,32 @@ public class Day5 extends Display{
 
 
 class Day5Frame extends DisplayFrame {
-	//Graphics
-	private Graphics2D g2;
-	private Dimension dim;	
-	private BufferedImage image;
-	private Graphics2D imageg2;
-
-	private final int FPS = 60;
-	
 	//Background
-	private final Color BACKGROUND_COLOR = Color.black;	
-	private File backgroundFile;
-	private BufferedImage backgroundImage = null;
+	//private String bgFileName = "kiritsugu.png"; //Transparency works! Commented outbecause it gets messy
+	private String bgFileName = "kingdra.jpg";
 	
 	//Audio
-	//private File beep = new File("drop1.wav");
+	private File beep = new File("drop1.wav");
 	private ArrayList<Arc> arcs = new ArrayList<Arc>();
 	private final int MAX_ARCS = 150;
 	private int x, y;
 	
 	public void init() {
-		g2 = (Graphics2D) this.getGraphics();
-		dim = this.getSize();
-		image = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
-		imageg2 = image.createGraphics();
-		addKeyboard();
-		addMouse();
-		
-		x = dim.width/2;
-		y = dim.height/2;
-		random();
+		try {
+			backgroundFile = new File(bgFileName);
+		}
+		catch (Exception e) {
+			System.out.println("File Load Failed");
+			//Logger here
+		}
+		super.init();
 		run();
 	}
 	
 	public void run() {
+		x = dim.width/2;
+		y = dim.height/2;
+		random();
 		while(true) {
 			try {
 				Thread.sleep(1000/FPS);
@@ -89,7 +81,7 @@ class Day5Frame extends DisplayFrame {
 				x = e.getX();
 				y = e.getY();
 				random();
-				//playAudio(beep, 2000);
+				playAudio(beep, 2000);
 			}		
 		};
 		this.addMouseListener(mouseListener);
@@ -113,8 +105,8 @@ class Arc{
 	private final int MAX_RAD = 2000;
 	private final int MIN_RAD = 10;
 	private final int R_BASE = 205;
-	private final int G_BASE = 205;
-	private final int B_BASE = 205;
+	private final int G_BASE = 105;
+	private final int B_BASE = 105;
 	private final int R_VARIANCE = 50;
 	private final int G_VARIANCE = 50;
 	private final int B_VARIANCE = 50;

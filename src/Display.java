@@ -11,12 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.*;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputAdapter;
@@ -39,17 +34,18 @@ public class Display extends JApplet {
 }
 
 class DisplayFrame extends JFrame {
-	private Graphics2D g2;
-	private BufferedImage image;
-	private Graphics2D imageg2;
-	private Dimension dim;
+	public Graphics2D g2;
+	public BufferedImage image;
+	public Graphics2D imageg2;
+	public Dimension dim;
 	
-	private final int FPS = 24;
+	public final int FPS = 60;
 	
 	//Background
-	private final Color BACKGROUND_COLOR = Color.gray;	
-	private File backgroundFile;
-	private BufferedImage backgroundImage = null;
+	public final Color BACKGROUND_COLOR = Color.black;
+	public File backgroundFile;
+	private String bgFileName;
+	public BufferedImage backgroundImage = null;
 	
 	private AudioThread audio;
 	
@@ -64,7 +60,6 @@ class DisplayFrame extends JFrame {
 		imageg2 = image.createGraphics();
 		addKeyboard();
 		addMouse();
-		
 		run();
 	}
 	
@@ -111,7 +106,7 @@ class DisplayFrame extends JFrame {
 	}
 	
 	public void drawBackground(Graphics2D g2, int width, int height, Color color, File file) {
-		if (backgroundFile == null) {
+		if (file == null) {
 			g2.setColor(color);
 			g2.fillRect(0, 0, width, height);
 		} else {
@@ -127,7 +122,12 @@ class DisplayFrame extends JFrame {
 	
 	public void playAudio(File file, int time) { //Plays an audio file for a specified time in milliseconds
 		audio = new AudioThread(file, time);
-		audio.start();
+		try {
+			audio.start();
+		}
+		catch (Exception e) {
+			//Logger info
+		}
 		audio = null;
 	}
 }
