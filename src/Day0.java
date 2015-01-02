@@ -44,7 +44,7 @@ class Day0Frame extends DisplayFrame {
 	private BufferedImage image;
 	private Graphics2D imageg2;
 
-	private final int FPS = 60;
+	private final int FPS = 120;
 	
 	//Background
 	private final Color BACKGROUND_COLOR = Color.white;	
