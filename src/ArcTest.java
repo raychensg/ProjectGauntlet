@@ -48,8 +48,8 @@ class ArcFrame extends DisplayFrame {
 		super.run();
 	}
 	
-	public void act(char key) {
-		super.act(key);
+	public void keyRead(char key, boolean state) {
+		super.keyRead(key, state);
 		//Add Key Commands here
 		if (key == 32){ //Java ASCII for Spacebar
 			System.out.println("Space!");

@@ -40,12 +40,16 @@ class DisplayFrame extends JFrame {
 	Graphics2D imageg2;
 	Dimension dim;
 	
-	final int FPS = 60;
+	final int FPS = 6;
 	double time;
+	
+	private final boolean PRESSED = true;
+	private final boolean RELEASED = false;
+	
 	
 	//Background
 	final Color BACKGROUND_COLOR = Color.black;
-	float bgAlpha = 0.2f;
+	float bgAlpha = 1.0f;
 	File backgroundFile;
 	String bgFileName;
 	BufferedImage backgroundImage = null;
@@ -69,10 +73,10 @@ class DisplayFrame extends JFrame {
 	
 	public void loadBackground() {
 		try {
-			backgroundFile = new File(bgFileName);
+			backgroundFile = new File(this.bgFileName);
 		}
 		catch (Exception e) {
-			System.out.println(bgFileName + " failed to load");
+			//System.out.println(bgFileName + " failed to load");
 		}
 	}
 	
@@ -82,12 +86,12 @@ class DisplayFrame extends JFrame {
 				Thread.sleep(1000/FPS);
 				time += 1000/FPS;
 			} catch (InterruptedException e) {}
-			action();
+			tick();
 			draw();
 		g2.drawImage(image, 0, 0, null);
 	}}
 	
-	public void action() {
+	public void tick() {
 		for (GObj o : queue) {
 			o.tick();
 		}
@@ -110,9 +114,11 @@ class DisplayFrame extends JFrame {
 	public void addKeyboard() {
 		this.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
-				act(e.getKeyChar());
+				keyRead(e.getKeyChar(), PRESSED);
 			}
-			public void keyReleased(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				keyRead(e.getKeyChar(), RELEASED);
+			}
 			public void keyTyped(KeyEvent e) {}
 		});
 	}
@@ -123,7 +129,7 @@ class DisplayFrame extends JFrame {
 		this.addMouseMotionListener(mouseListener);
 	}
 	
-	public void act(char key) {
+	public void keyRead(char key, boolean state) {
 		if (key == 27){ //27 is the Java ASCII for esc
 			WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
 	        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
@@ -135,7 +141,7 @@ class DisplayFrame extends JFrame {
 			g2.setColor(color);
 			g2.fillRect(0, 0, width, height);
 		} else {
-			try { //For Image backgrounds
+			try {
 			    backgroundImage = ImageIO.read(file);
 			} catch (IOException e) {
 				g2.setColor(color);
