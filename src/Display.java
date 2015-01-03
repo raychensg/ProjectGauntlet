@@ -49,7 +49,7 @@ class DisplayFrame extends JFrame {
 	
 	//Background
 	final Color BACKGROUND_COLOR = Color.black;
-	float bgAlpha = 1.0f;
+	float bgAlpha = 0.2f;
 	File backgroundFile;
 	String bgFileName;
 	BufferedImage backgroundImage = null;

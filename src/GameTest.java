@@ -34,10 +34,13 @@ class GameFrame extends DisplayFrame {
 	private short[] keys = new short[NUM_KEYS];
 	private boolean[] keysDown = new boolean[NUM_KEYS];
 	
-	private boolean playerCenter = false; //Useful for tight rooms where camera movement is unnecessary
-	
 	private Player player;
 	private final String playerSprites = "assets/sprites.png";
+	
+	public GameFrame() {
+		bgFileName = "assets/aquabase.png";
+		bgAlpha = 1.0f;
+	}
 	
 	public void run() {
 		initKeys();
@@ -65,7 +68,8 @@ class GameFrame extends DisplayFrame {
 		player.setKeysDown(keysDown);
 		super.tick();
 		//Do Stuff
-		keysDown = new boolean[NUM_KEYS]; //Clear Keys
+		g2.setColor(Color.red);
+		g2.fillRect(100, 100, 100, 100);
 	}
 	
 	public void keyRead(char key, boolean state) {
@@ -99,7 +103,6 @@ class GameFrame extends DisplayFrame {
 					player.setOrientation((byte) 0);
 				else
 					player.setOrientation((byte) 3);
-				System.out.println(player._getOrientation());
 			}
 			public void mouseDragged(MouseEvent e) {
 				//TODO
@@ -147,7 +150,6 @@ class Vector {
 		if (angle > 360) angle = angle%360;
 	}
 	public float getAngle() {
-		System.out.println(angle);
 		return angle;
 	}
 	public float getDistance() {
@@ -198,11 +200,13 @@ class Character extends GObj {
 		}
 		xCorner = orientation*SPRITE_WIDTH;
 		if (moving){
-			yCorner = yCorner + SPRITE_HEIGHT;
+			if (yCorner == 0) yCorner = SPRITE_HEIGHT;
+			else if (yCorner == SPRITE_HEIGHT) yCorner = SPRITE_HEIGHT;
+			else if (yCorner == 0) yCorner = SPRITE_HEIGHT;
+			else yCorner = SPRITE_HEIGHT;
 		}
 		else yCorner = 0;
-		if (yCorner > 3*SPRITE_HEIGHT) yCorner = 0;
-		g2.drawImage(spriteImage, x - SPRITE_WIDTH/2, y - SPRITE_HEIGHT/2, x + SPRITE_WIDTH/2, y + SPRITE_HEIGHT, xCorner, yCorner, xCorner + SPRITE_WIDTH, yCorner + SPRITE_HEIGHT, null);
+		g2.drawImage(spriteImage, x - SPRITE_WIDTH/2, y - SPRITE_HEIGHT/2, x + SPRITE_WIDTH/2, y + SPRITE_HEIGHT/2, xCorner, yCorner, xCorner + SPRITE_WIDTH, yCorner + SPRITE_HEIGHT, null);
 	}
 	
 	public void kill() {
