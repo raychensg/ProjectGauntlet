@@ -40,7 +40,7 @@ class DisplayFrame extends JFrame {
 	Graphics2D imageg2;
 	Dimension dim;
 	
-	final int FPS = 6;
+	final int FPS = 60;
 	double time;
 	
 	private final boolean PRESSED = true;

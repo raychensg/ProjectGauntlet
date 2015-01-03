@@ -37,11 +37,6 @@ class GameFrame extends DisplayFrame {
 	private Player player;
 	private final String playerSprites = "assets/sprites.png";
 	
-	public GameFrame() {
-		bgFileName = "assets/aquabase.png";
-		bgAlpha = 1.0f;
-	}
-	
 	public void run() {
 		initKeys();
 		queue = new ArrayList<GObj>();
@@ -68,8 +63,6 @@ class GameFrame extends DisplayFrame {
 		player.setKeysDown(keysDown);
 		super.tick();
 		//Do Stuff
-		g2.setColor(Color.red);
-		g2.fillRect(100, 100, 100, 100);
 	}
 	
 	public void keyRead(char key, boolean state) {
@@ -93,16 +86,7 @@ class GameFrame extends DisplayFrame {
 				//TODO
 			}
 			public void mouseMoved(MouseEvent e) {
-				Vector v = new Vector(player.getX(), player.getY(), e.getX(), e.getY());
-				double a = v.getAngle();
-				if (a > 45 && a <= 135)
-					player.setOrientation((byte) 2);
-				else if (a > 135 && a <= 225)
-					player.setOrientation((byte) 1);
-				else if (a > 225 && a <= 315)
-					player.setOrientation((byte) 0);
-				else
-					player.setOrientation((byte) 3);
+				player.checkOrientation(e.getX(), e.getY());
 			}
 			public void mouseDragged(MouseEvent e) {
 				//TODO
@@ -125,6 +109,19 @@ class Player extends Character {
 		this.keysDown = keysDown;
 	}
 	
+	public void checkOrientation(int pointerX, int pointerY) {
+		Vector v = new Vector(x, y, pointerX, pointerY);
+		double a = v.getAngle();
+		if (a > 45 && a <= 135)
+			orientation = 2;
+		else if (a > 135 && a <= 225)
+			orientation = 1;
+		else if (a > 225 && a <= 315)
+			orientation = 0;
+		else
+			orientation = 3;
+	}
+	
 	public void tick() {
 		int deltaX = 0;
 		int deltaY = 0;
@@ -132,10 +129,15 @@ class Player extends Character {
 		if (keysDown[2]) deltaY += STEP;
 		if (keysDown[1]) deltaX -= STEP;
 		if (keysDown[3]) deltaX += STEP;
-		if (deltaX != 0 || deltaY != 0) moving = true;
-		else moving = false;
-		x += deltaX;
-		y -= deltaY;
+		if (deltaX != 0 || deltaY != 0) {
+			moving = true;
+		}
+		else {
+			moving = false;
+			movingTime = 0;
+		}
+		if (moving) movingTime++;
+		if (movingTime >= 4*QUARTER_MOVE) movingTime = 0;
 	}
 }
 
@@ -161,11 +163,13 @@ class Character extends GObj {
 	private boolean alive = true;
 	private File spriteFile;
 	private BufferedImage spriteImage;
-	private byte orientation;
+	byte orientation;
 	boolean moving;
+	int movingTime;
 	
 	private final byte SPRITE_WIDTH = 30;
 	private final byte SPRITE_HEIGHT = 30;
+	final int QUARTER_MOVE = 5;
 	
 	int x, y;
 	private int xCorner, yCorner;
@@ -200,10 +204,10 @@ class Character extends GObj {
 		}
 		xCorner = orientation*SPRITE_WIDTH;
 		if (moving){
-			if (yCorner == 0) yCorner = SPRITE_HEIGHT;
-			else if (yCorner == SPRITE_HEIGHT) yCorner = SPRITE_HEIGHT;
-			else if (yCorner == 0) yCorner = SPRITE_HEIGHT;
-			else yCorner = SPRITE_HEIGHT;
+			if (movingTime >= 0 && movingTime <= QUARTER_MOVE) yCorner = SPRITE_HEIGHT;
+			else if (movingTime >= QUARTER_MOVE && movingTime < 2*QUARTER_MOVE) yCorner = 0;
+			else if (movingTime >= 2*QUARTER_MOVE && movingTime < 3*QUARTER_MOVE) yCorner = 2*SPRITE_HEIGHT;
+			else if (movingTime >= 3*QUARTER_MOVE && movingTime < 4*QUARTER_MOVE) yCorner = 0;
 		}
 		else yCorner = 0;
 		g2.drawImage(spriteImage, x - SPRITE_WIDTH/2, y - SPRITE_HEIGHT/2, x + SPRITE_WIDTH/2, y + SPRITE_HEIGHT/2, xCorner, yCorner, xCorner + SPRITE_WIDTH, yCorner + SPRITE_HEIGHT, null);
