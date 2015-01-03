@@ -3,7 +3,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -22,56 +24,35 @@ public class ArcTest extends Display{
 	}
 }
 
-
 class ArcFrame extends DisplayFrame {
-	//Background
-	//private String bgFileName = "kiritsugu.png"; //Transparency works! Commented outbecause it gets messy
-	private String bgFileName = "kingdra.jpg";
 	
 	//Audio
 	private File beep = new File("drop1.wav");
-	private ArrayList<Arc> arcs = new ArrayList<Arc>();
+	
+	//Data
 	private final int MAX_ARCS = 150;
 	private int x, y;
 	
-	public void init() {
-		try {
-			backgroundFile = new File(bgFileName);
-		}
-		catch (Exception e) {
-			System.out.println("File Load Failed");
-			//Logger here
-		}
-		super.init();
-		run();
+	public ArcFrame() {
+		bgFileName = "kingdra.jpg";
+		bgAlpha = 0.5f;
+		//bgFileName = "kiritsugu.png"; 
+		//Transparency works! Commented out because it gets messy
+		queue = new ArrayList<GObj>();
 	}
 	
 	public void run() {
 		x = dim.width/2;
 		y = dim.height/2;
 		random();
-		while(true) {
-			try {
-				Thread.sleep(1000/FPS);
-			} catch (InterruptedException e) {}
-			action();
-			draw();
-			g2.drawImage(image, 0, 0, null);
-		}
+		super.run();
 	}
 	
-	public void action() {
-		for(Arc a: arcs) {
-			a.step();
-		}
-	}
-	
-	public void draw() {
-		imageg2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .3f));
-		drawBackground(imageg2, dim.width, dim.height, BACKGROUND_COLOR, backgroundFile);
-		
-		for(Arc a: arcs) {
-			a.draw(imageg2);
+	public void act(char key) {
+		super.act(key);
+		//Add Key Commands here
+		if (key == 32){ //Java ASCII for Spacebar
+			System.out.println("Space!");
 		}
 	}
 	
@@ -89,16 +70,16 @@ class ArcFrame extends DisplayFrame {
 	}
 	
 	public void random() {
-		arcs = new ArrayList<Arc>();
+		queue = new ArrayList<GObj>();
 		int count = (int) (MAX_ARCS*Math.random())/2;
 		while (count < MAX_ARCS) {
-			arcs.add(new Arc(x, y));
+			queue.add(new Arc(x, y));
 			count++;
 		}
 	}
 }
 
-class Arc{
+class Arc extends GObj{
 	private int x, y, theta, radius, width, movement;
 	private float alpha, goalAlpha;
 	private Color color;
@@ -123,7 +104,7 @@ class Arc{
 		color = new Color((int)(Math.random()*R_VARIANCE + R_BASE), (int)(Math.random()*G_VARIANCE + G_BASE), (int)(Math.random()*B_VARIANCE + B_BASE));
 	}
 	
-	public void step() {
+	public void tick() {
 		theta+=movement;
 		if (theta > 360)
 			theta -= 360;

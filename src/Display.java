@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -34,24 +35,26 @@ public class Display extends JApplet {
 }
 
 class DisplayFrame extends JFrame {
-	public Graphics2D g2;
-	public BufferedImage image;
-	public Graphics2D imageg2;
-	public Dimension dim;
+	Graphics2D g2;
+	BufferedImage image;
+	Graphics2D imageg2;
+	Dimension dim;
 	
-	public final int FPS = 60;
+	final int FPS = 60;
+	double time;
 	
 	//Background
-	public final Color BACKGROUND_COLOR = Color.black;
-	public File backgroundFile;
-	private String bgFileName;
-	public BufferedImage backgroundImage = null;
+	final Color BACKGROUND_COLOR = Color.black;
+	float bgAlpha = 0.2f;
+	File backgroundFile;
+	String bgFileName;
+	BufferedImage backgroundImage = null;
 	
+	//Audio
 	private AudioThread audio;
 	
-	public DisplayFrame() {
-		super();
-	}
+	//Data
+	ArrayList<GObj> queue = new ArrayList<GObj>();
 	
 	public void init() {
 		g2 = (Graphics2D) this.getGraphics();
@@ -60,13 +63,24 @@ class DisplayFrame extends JFrame {
 		imageg2 = image.createGraphics();
 		addKeyboard();
 		addMouse();
+		loadBackground();
 		run();
+	}
+	
+	public void loadBackground() {
+		try {
+			backgroundFile = new File(bgFileName);
+		}
+		catch (Exception e) {
+			System.out.println(bgFileName + " failed to load");
+		}
 	}
 	
 	public void run() {		
 		while(true) {
 			try {
 				Thread.sleep(1000/FPS);
+				time += 1000/FPS;
 			} catch (InterruptedException e) {}
 			action();
 			draw();
@@ -74,12 +88,23 @@ class DisplayFrame extends JFrame {
 	}}
 	
 	public void action() {
-		
+		for (GObj o : queue) {
+			o.tick();
+		}
 	}
 	
 	public void draw() {
 		imageg2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		drawBackground(imageg2, dim.width, dim.height, BACKGROUND_COLOR, backgroundFile);
+		
+		for (GObj o : queue) {
+			try {
+				o.draw(imageg2);
+			}
+			catch (Exception e){
+				System.out.println(e);
+			};
+		}
 	}
 	
 	public void addKeyboard() {
@@ -116,6 +141,7 @@ class DisplayFrame extends JFrame {
 				g2.setColor(color);
 				g2.fillRect(0, 0, width, height);
 			}
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, bgAlpha));
 			g2.drawImage(backgroundImage, 0, 0, width, height, 0, 0, width, height, null);
 		}
 	}
@@ -130,6 +156,12 @@ class DisplayFrame extends JFrame {
 		}
 		audio = null;
 	}
+}
+
+class GObj {
+	public void tick() {}
+	public void draw(Graphics2D g2) {};
+	
 }
 
 class AudioThread extends Thread {

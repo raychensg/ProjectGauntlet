@@ -38,9 +38,6 @@ public class RippleTest extends Display{
 
 
 class RippleFrame extends DisplayFrame {
-	//Background
-	private String bgFileName = "kingdra.jpg";
-	
 	//Audio
 	private File drop1 = new File("drop1.wav");
 	private File drop2 = new File("drop2.wav");
@@ -53,40 +50,19 @@ class RippleFrame extends DisplayFrame {
 	private final int SPACING = 20;
 	private final int VARIANCE = 200;
 	private final int RAININESS = 2;
-	private double time;
 		
 	//Data
 	private ArrayList<Ripple> ripples = new ArrayList<Ripple>();
 	private ArrayList<Ripple> ripplesQueue = new ArrayList<Ripple>();
 	
-	public void init() {
-		try {
-			backgroundFile = new File(bgFileName);
-		}
-		catch (Exception e) {
-			System.out.println("File Load Failed");
-			//Logger here
-		}
-		super.init();
-		run();
-	}
-	
-	public void run() {
-		while(true) {
-			try {
-				Thread.sleep(1000/FPS);
-				time += 1000/FPS;
-			} catch (InterruptedException e) {}
-			action();
-			draw();
-			g2.drawImage(image, 0, 0, null);
-		}
+	public RippleFrame() {
+		bgFileName = "kingdra.jpg";
 	}
 	
 	public void action() {
 		random();
 		for (int i = 0; i < ripples.size(); i++) {
-			ripples.get(i).step();
+			ripples.get(i).tick();
 			if (ripples.get(i).getAlphaValue() < 0.1) {
 				ripples.remove(ripples.get(i));
 				i--;
@@ -99,12 +75,8 @@ class RippleFrame extends DisplayFrame {
 	}
 	
 	public void draw() {
-		imageg2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
-		drawBackground(imageg2, dim.width, dim.height, BACKGROUND_COLOR, backgroundFile);
-
+		super.draw();
 		for (Ripple r: ripples) {
-			imageg2.setComposite(r.getAlpha());
-			imageg2.setColor(r.getColor());
 			r.draw(imageg2);
 		}
 	}
@@ -181,27 +153,21 @@ class Ripple {
 		color = new Color((int)(BRIGHTNESS + VARIANCE*Math.random()), BRIGHTNESS + (int)(VARIANCE*Math.random()), BRIGHTNESS + (int)(VARIANCE*Math.random()));
 	}
 	
-	public void step() {
+	public void tick() {
 		radius += step;
 		alpha -= alphaStep;
 		if (alpha < 0)
 			alpha = 0;
 	}
 	
-	public void draw(Graphics2D g2) {
-		g2.drawOval(x - radius,y - radius, 2*radius, 2*radius);
-	}
-	
 	public float getAlphaValue() {
 		return alpha;
 	}
 	
-	public Color getColor() {
-		return color;
-	}
-	
-	public Composite getAlpha() {
-		return AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+	public void draw(Graphics2D g2) {
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+		g2.setColor(color);
+		g2.drawOval(x - radius,y - radius, 2*radius, 2*radius);
 	}
 	
 	public int getX() {
