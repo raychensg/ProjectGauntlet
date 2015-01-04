@@ -49,7 +49,7 @@ class DisplayFrame extends JFrame {
 	
 	//Background
 	private final Color BACKGROUND_COLOR = Color.black;
-	private float bgAlpha;
+	private float bgAlpha = 1;
 	private File backgroundFile;
 	private String bgFileName;
 	private BufferedImage backgroundImage;
@@ -90,6 +90,7 @@ class DisplayFrame extends JFrame {
 	public void resetTime() { time = 0;}
 	public void addToQueue(GObj o) { queue.add(o);}
 	public void setQueue(ArrayList<GObj> q) { queue = q;}
+	public ArrayList<GObj> getQueue() { return queue;}
 	public void clearQueue() { queue = new ArrayList<GObj>();}
 	
 	public void run() {		
@@ -183,7 +184,6 @@ class DisplayFrame extends JFrame {
 class GObj {
 	public void tick() {}
 	public void draw(Graphics2D g2) {};
-	
 }
 
 class AudioThread extends Thread {

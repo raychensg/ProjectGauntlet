@@ -42,9 +42,9 @@ class GameFrame extends DisplayFrame {
 	
 	public void run() {
 		initKeys();
-		queue = new ArrayList<GObj>();
+		clearQueue();
 		player = new Player(playerSprites, getDim().width/2, getDim().height/2);
-		queue.add(player);
+		addToQueue(player);
 		super.run();
 	}
 	
@@ -100,6 +100,24 @@ class GameFrame extends DisplayFrame {
 	}
 }
 
+class Vector {
+	private float distance;
+	private float angle;
+	public Vector(int x1, int y1, int x2, int y2) {
+		distance = (float) Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2) * (y1 - y2));
+		angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x1 - x2));
+		angle += 180;
+		if (angle < 0) angle += 360;
+		if (angle > 360) angle = angle%360;
+	}
+	public float getAngle() {
+		return angle;
+	}
+	public float getDistance() {
+		return distance;
+	}
+}
+
 class Player extends Character {
 	private final int STEP = 15;
 	private boolean[] keysDown;
@@ -126,6 +144,7 @@ class Player extends Character {
 	}
 	
 	public void tick() {
+		super.tick();
 		int deltaX = 0;
 		int deltaY = 0;
 		if (keysDown[0]) deltaY -= STEP;
@@ -144,26 +163,8 @@ class Player extends Character {
 	}
 }
 
-class Vector {
-	private float distance;
-	private float angle;
-	public Vector(int x1, int y1, int x2, int y2) {
-		distance = (float) Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2) * (y1 - y2));
-		angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x1 - x2));
-		angle += 180;
-		if (angle < 0) angle += 360;
-		if (angle > 360) angle = angle%360;
-	}
-	public float getAngle() {
-		return angle;
-	}
-	public float getDistance() {
-		return distance;
-	}
-}
-
 class Character extends GObj {
-	private boolean alive = true;
+	private String spriteFileName;
 	private File spriteFile;
 	private BufferedImage spriteImage;
 	byte orientation;
@@ -178,6 +179,7 @@ class Character extends GObj {
 	private int xCorner, yCorner;
 	
 	public Character(String spriteFileName, int x, int y) {
+		this.spriteFileName = spriteFileName;
 		this.x = x;
 		this.y = y;
 		try {
@@ -187,8 +189,6 @@ class Character extends GObj {
 			System.out.println(spriteFileName + " failed to load");
 		}
 	}
-	
-	public void tick() {}
 	
 	public void setOrientation(byte o) {
 		orientation = o;
@@ -203,7 +203,7 @@ class Character extends GObj {
 		try {
 		    spriteImage = ImageIO.read(spriteFile);
 		} catch (IOException e) {
-			System.out.println();
+			System.out.println("File failed to load");
 		}
 		xCorner = orientation*SPRITE_WIDTH;
 		if (moving){
@@ -213,10 +213,12 @@ class Character extends GObj {
 			else if (movingTime >= 3*QUARTER_MOVE && movingTime < 4*QUARTER_MOVE) yCorner = 0;
 		}
 		else yCorner = 0;
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		g2.drawImage(spriteImage, x - SPRITE_WIDTH/2, y - SPRITE_HEIGHT/2, x + SPRITE_WIDTH/2, y + SPRITE_HEIGHT/2, xCorner, yCorner, xCorner + SPRITE_WIDTH, yCorner + SPRITE_HEIGHT, null);
 	}
 	
-	public void kill() {
-		alive = false;
+	public String toString() {
+		return spriteFileName;
+		//TODO more detailed debugging statement
 	}
 }
