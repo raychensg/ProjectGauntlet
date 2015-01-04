@@ -27,30 +27,29 @@ public class ArcTest extends Display{
 class ArcFrame extends DisplayFrame {
 	
 	//Audio
-	private File beep = new File("drop1.wav");
+	private File beep = new File("assets/drop1.wav");
 	
 	//Data
 	private final int MAX_ARCS = 150;
 	private int x, y;
 	
+	//Background
+	private final String BACKGROUND = "assets/kingdra.jpg";
+	
 	public ArcFrame() {
-		bgFileName = "kingdra.jpg";
-		bgAlpha = 0.5f;
-		//bgFileName = "kiritsugu.png"; 
-		//Transparency works! Commented out because it gets messy
-		queue = new ArrayList<GObj>();
+		setBackground(BACKGROUND, 0.1f);
+		clearQueue();
 	}
 	
 	public void run() {
-		x = dim.width/2;
-		y = dim.height/2;
+		x = getDim().width/2;
+		y = getDim().height/2;
 		random();
 		super.run();
 	}
 	
 	public void keyRead(char key, boolean state) {
 		super.keyRead(key, state);
-		//Add Key Commands here
 		if (key == 32){ //Java ASCII for Spacebar
 			System.out.println("Space!");
 		}
@@ -70,10 +69,10 @@ class ArcFrame extends DisplayFrame {
 	}
 	
 	public void random() {
-		queue = new ArrayList<GObj>();
+		clearQueue();
 		int count = (int) (MAX_ARCS*Math.random())/2;
 		while (count < MAX_ARCS) {
-			queue.add(new Arc(x, y));
+			addToQueue(new Arc(x, y));
 			count++;
 		}
 	}
@@ -108,14 +107,6 @@ class Arc extends GObj{
 		theta+=movement;
 		if (theta > 360)
 			theta -= 360;
-//		radius+=2;
-//		alpha = (alpha + goalAlpha)/2;
-//		if (alpha < .001) {
-//			radius = (int)(Math.random()*(MAX_RAD-MIN_RAD) + MIN_RAD);
-//			goalAlpha = (float) Math.random();
-//		}
-//		if (alpha > goalAlpha - .001)
-//			goalAlpha = 0;
 	}
 	
 	public void draw(Graphics2D g2) {

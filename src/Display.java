@@ -35,50 +35,62 @@ public class Display extends JApplet {
 }
 
 class DisplayFrame extends JFrame {
-	Graphics2D g2;
-	BufferedImage image;
-	Graphics2D imageg2;
-	Dimension dim;
+	private Graphics2D g2;
+	private BufferedImage image;
+	private Graphics2D imageg2;
+	private Dimension dim;
 	
-	final int FPS = 60;
-	double time;
+	private final int FPS = 60;
+	private double time;
 	
 	private final boolean PRESSED = true;
 	private final boolean RELEASED = false;
 	
 	
 	//Background
-	final Color BACKGROUND_COLOR = Color.black;
-	float bgAlpha = 0.2f;
-	File backgroundFile;
-	String bgFileName;
-	BufferedImage backgroundImage = null;
+	private final Color BACKGROUND_COLOR = Color.black;
+	private float bgAlpha;
+	private File backgroundFile;
+	private String bgFileName;
+	private BufferedImage backgroundImage;
 	
 	//Audio
 	private AudioThread audio;
 	
 	//Data
-	ArrayList<GObj> queue = new ArrayList<GObj>();
+	private ArrayList<GObj> queue = new ArrayList<GObj>();
 	
 	public void init() {
+		initGraphics();
+		addKeyboard();
+		addMouse();
+		run();
+	}
+	
+	public void initGraphics() {
 		g2 = (Graphics2D) this.getGraphics();
 		dim = this.getSize();
 		image = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
 		imageg2 = image.createGraphics();
-		addKeyboard();
-		addMouse();
-		loadBackground();
-		run();
 	}
 	
-	public void loadBackground() {
+	public void setBackground(String fileName, float alpha) {
+		bgAlpha = alpha;
+		bgFileName = fileName;
 		try {
 			backgroundFile = new File(this.bgFileName);
 		}
 		catch (Exception e) {
-			//System.out.println(bgFileName + " failed to load");
+			backgroundFile = null;
 		}
 	}
+	
+	public Dimension getDim() {return dim;}
+	public double getTime() {return time;}
+	public void resetTime() { time = 0;}
+	public void addToQueue(GObj o) { queue.add(o);}
+	public void setQueue(ArrayList<GObj> q) { queue = q;}
+	public void clearQueue() { queue = new ArrayList<GObj>();}
 	
 	public void run() {		
 		while(true) {
@@ -93,12 +105,16 @@ class DisplayFrame extends JFrame {
 	
 	public void tick() {
 		for (GObj o : queue) {
-			o.tick();
+			try {
+				o.tick();
+			}
+			catch (Exception e) {
+				System.out.println("Concurrent  Modification: " + e);
+			}
 		}
 	}
 	
 	public void draw() {
-		imageg2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		drawBackground(imageg2, dim.width, dim.height, BACKGROUND_COLOR, backgroundFile);
 		
 		for (GObj o : queue) {
@@ -137,6 +153,7 @@ class DisplayFrame extends JFrame {
 	}
 	
 	public void drawBackground(Graphics2D g2, int width, int height, Color color, File file) {
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, bgAlpha));
 		if (file == null) {
 			g2.setColor(color);
 			g2.fillRect(0, 0, width, height);
@@ -147,7 +164,6 @@ class DisplayFrame extends JFrame {
 				g2.setColor(color);
 				g2.fillRect(0, 0, width, height);
 			}
-			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, bgAlpha));
 			g2.drawImage(backgroundImage, 0, 0, width, height, 0, 0, width, height, null);
 		}
 	}
@@ -193,7 +209,7 @@ class AudioThread extends Thread {
 		try {
 			audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(soundFile + " failed to load");
 			System.exit(1);
 		}
 		audioFormat = audioInputStream.getFormat();

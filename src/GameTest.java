@@ -29,18 +29,21 @@ class GameFrame extends DisplayFrame {
 	//Audio
 	private File beep = new File("assets/drop1.wav");
 	
-	//Data
+	//Keyboard Input
+	//private String configFileName = "config.txt";
+	//private File configFile;
 	private final byte NUM_KEYS = 10;
 	private short[] keys = new short[NUM_KEYS];
 	private boolean[] keysDown = new boolean[NUM_KEYS];
 	
+	//Player Data
 	private Player player;
 	private final String playerSprites = "assets/sprites.png";
 	
 	public void run() {
 		initKeys();
 		queue = new ArrayList<GObj>();
-		player = new Player(playerSprites, dim.width/2, dim.height/2);
+		player = new Player(playerSprites, getDim().width/2, getDim().height/2);
 		queue.add(player);
 		super.run();
 	}

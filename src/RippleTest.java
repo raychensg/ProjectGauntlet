@@ -39,9 +39,9 @@ public class RippleTest extends Display{
 
 class RippleFrame extends DisplayFrame {
 	//Audio
-	private File drop1 = new File("drop1.wav");
-	private File drop2 = new File("drop2.wav");
-	private File drop3 = new File("drop3.wav");
+	private File drop1 = new File("assets/drop1.wav");
+	private File drop2 = new File("assets/drop2.wav");
+	private File drop3 = new File("assets/drop3.wav");
 	
 	//Functionality
 	private final int SMALL = 2;
@@ -52,33 +52,34 @@ class RippleFrame extends DisplayFrame {
 	private final int RAININESS = 2;
 		
 	//Data
-	private ArrayList<Ripple> ripples = new ArrayList<Ripple>();
-	private ArrayList<Ripple> ripplesQueue = new ArrayList<Ripple>();
+	private ArrayList<GObj> ripples = new ArrayList<GObj>();
+	private ArrayList<GObj> ripplesQueue = new ArrayList<GObj>();
+	
+	//Background
+	private final String BACKGROUND = "assets/kingdra.jpg";
 	
 	public RippleFrame() {
-		bgFileName = "kingdra.jpg";
+		setBackground(BACKGROUND, 0.5f);
 	}
 	
-	public void action() {
+	public void tick() {
 		random();
 		for (int i = 0; i < ripples.size(); i++) {
 			ripples.get(i).tick();
-			if (ripples.get(i).getAlphaValue() < 0.1) {
+			if (((Ripple) ripples.get(i)).getAlphaValue() < 0.1) {
 				ripples.remove(ripples.get(i));
 				i--;
 			}
 		}
-		for (Ripple r: ripplesQueue) {
+		for (GObj r: ripplesQueue) {
 			ripples.add(r);
 		}
-		ripplesQueue = new ArrayList<Ripple>();
+		ripplesQueue = new ArrayList<GObj>();
 	}
 	
 	public void draw() {
+		setQueue(ripples);
 		super.draw();
-		for (Ripple r: ripples) {
-			r.draw(imageg2);
-		}
 	}
 	
 	public void addMouse() {
@@ -87,13 +88,13 @@ class RippleFrame extends DisplayFrame {
 			public void mousePressed(MouseEvent e) {
 				ripplesQueue.add(new Ripple(e.getX(), e.getY(), LARGE));
 				playAudio(drop3, 2000);
-				time = 0;
+				resetTime();
 			}		
 			public void mouseReleased(MouseEvent e) {
-				if (time > 250) {
+				if (getTime() > 250) {
 					ripplesQueue.add(new Ripple(e.getX(), e.getY(), HUGE));
 					playAudio(drop3, 2000);
-					time = 0;
+					resetTime();
 				}
 			}
 			public void mouseMoved(MouseEvent e) {
@@ -126,7 +127,7 @@ class RippleFrame extends DisplayFrame {
 	public void random() { //Generates random ripples
 		for (int i = 0; i < RAININESS; i++)  {
 			if (RAININESS*Math.random() > 10*Math.random()) {
-				ripplesQueue.add(new Ripple((int)(Math.random()*dim.width), (int)(Math.random()*dim.height), SMALL));
+				ripplesQueue.add(new Ripple((int)(Math.random()*getDim().width), (int)(Math.random()*getDim().height), SMALL));
 				if (2*Math.random() > 1)
 					playAudio(drop1, 2000);
 				else
@@ -136,7 +137,7 @@ class RippleFrame extends DisplayFrame {
 	}
 }
 
-class Ripple {
+class Ripple extends GObj {
 	private int x, y, radius, step;
 	private float alpha = 1;
 	private double alphaStep;
